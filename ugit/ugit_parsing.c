@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// Funciones "vacías" para que completes después
 void cmd_init() {
     printf("[ugit] Inicializando repositorio...\n");
     // TODO: crear carpeta .ugit
@@ -51,3 +50,4 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+
