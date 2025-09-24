@@ -2,14 +2,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-void crear_versions();
-
-int main() {
-
-	crear_versions();
-	return 0;
-}
-
 void crear_versions() {
 
 	//Si carpeta existe, copiar, sino, crearla y luego copiar
@@ -18,5 +10,6 @@ void crear_versions() {
 	} else {
 		printf("La carpeta 'versions' ya existe. \n");
 	}
+
 
 }
