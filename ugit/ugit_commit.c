@@ -4,11 +4,11 @@
 #include <string.h>
 #include <direct.h>   
 #include <errno.h>
+#include <time.h>   
 
 #define BUF_SIZE 8192
 
-// copia binaria de archivo (source -> dest). Devuelve 0 si OK, -1 si error.
-static int copiar_archivo(const char *origen, const char *destino) {
+int copiar_archivo(const char *origen, const char *destino) {
     FILE *fsrc = fopen(origen, "rb");
     if (!fsrc) return -1;
     FILE *fdst = fopen(destino, "wb");
@@ -32,17 +32,14 @@ void cmd_commit() {
         return;
     }
 
-    // Determinar nuevo número de commit buscando el primer commitN que no exista
     int commit_num = 1;
     char commit_folder[512];
     while (1) {
         sprintf(commit_folder, "ugit\\commit%d", commit_num);
         if (_mkdir(commit_folder) == 0) {
-            // carpeta creada correctamente -> este será el commit
-            break;
+            break; 
         } else {
             if (errno == EEXIST) {
-                // existe, probar siguiente número
                 commit_num++;
                 continue;
             } else {
@@ -53,11 +50,18 @@ void cmd_commit() {
         }
     }
 
-    // Leer cada línea del index y copiar el archivo al commit_folder
+    char filelist_path[512];
+    sprintf(filelist_path, "%s\\filelist.txt", commit_folder);
+    FILE *filelist = fopen(filelist_path, "w");
+    if (!filelist) {
+        printf("Error creando filelist.txt en %s\n", commit_folder);
+        fclose(index);
+        return;
+    }
+
     char filename[512];
     int copied = 0;
     while (fgets(filename, sizeof(filename), index) != NULL) {
-        // quitar salto de línea
         size_t len = strlen(filename);
         if (len > 0 && (filename[len-1] == '\n' || filename[len-1] == '\r')) {
             filename[len-1] = '\0';
@@ -67,10 +71,10 @@ void cmd_commit() {
         if (len == 0) continue;
 
         char destpath[1024];
-        // construir destino
         sprintf(destpath, "%s\\%s", commit_folder, filename);
 
         if (copiar_archivo(filename, destpath) == 0) {
+            fprintf(filelist, "%s\n", filename); 
             printf("Copiado: %s -> %s\n", filename, destpath);
             copied++;
         } else {
@@ -78,11 +82,24 @@ void cmd_commit() {
         }
     }
 
+    fclose(filelist);
     fclose(index);
 
-    // Limpiar index (staging) para el próximo commit
     index = fopen("ugit/index.txt", "w");
     if (index) fclose(index);
+
+    FILE *log_file = fopen("ugit/commits.log", "a");
+    if (log_file) {
+        time_t t = time(NULL);
+        struct tm *tm_info = localtime(&t);
+        char fecha[64];
+        strftime(fecha, sizeof(fecha), "%Y-%m-%d %H:%M:%S", tm_info);
+
+        fprintf(log_file, "commit %d | Fecha: %s | Archivos: %d\n",
+                commit_num, fecha, copied);
+
+        fclose(log_file);
+    }
 
     printf("Commit creado: %s (archivos copiados: %d)\n", commit_folder, copied);
 }
