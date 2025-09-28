@@ -25,6 +25,7 @@ El objetivo es comprender cómo funcionan conceptos como el área de staging, co
 ## Documentacion
 
 La Documentacion se generara en base al archivo Doxyfile , Descargue e instale Doxygen para poder verlo en Html (https://www.doxygen.nl/)
+
 ---
 
 ## Compilación
