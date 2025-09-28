@@ -1,0 +1,17 @@
+
+Compilador:
+
+gcc ugit.c ugit_parsing.c ugit_init.c ugit_add.c ugit_commit.c ugit_version.c -o ugit
+
+
+Comando Utilizables dentro de Ugit:
+
+./ugit init       Se encarga de crear el repositorio
+./ugit add        Agrega el tracer al archivo dentro del repositorio
+./ugit commit     Crea el commit
+./ugit version    Muestra listado de versiones
+
+
+
+
+
