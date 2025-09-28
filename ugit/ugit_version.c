@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 void cmd_version() {
-    printf("=== Contenido de 'versions' ===\n");
-    system("dir versions /b");
+    printf("=== Contenido de Ugit Version ===\n");
+    system("dir ugit /b");
     printf("=== Fin del contenido ===\n");
 }
+
