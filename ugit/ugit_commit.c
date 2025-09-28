@@ -1,3 +1,15 @@
+/**
+ * @file ugit_commit.c
+ * @brief Implementación del comando commit de µGit.
+ *
+ * Esta función permite crear un commit tomando los archivos que se encuentran
+ * en el área de preparación (staging) definida en "ugit/index.txt" y copiándolos
+ * a una carpeta única dentro de "ugit/commitN". Además genera un registro
+ * en "ugit/commits.log" y un listado de archivos en "filelist.txt" para cada commit.
+ *
+ * @author Andres Barbosa , Ivan Gallardo , Luis Muñoz
+ * @date 2025-09-28
+ */
 #include "ugit.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +20,16 @@
 
 #define BUF_SIZE 8192
 
+/**
+ * @brief Copia un archivo de manera binaria.
+ *
+ * Copia el contenido de un archivo de origen a un archivo destino.
+ * Se utiliza para guardar versiones exactas de los archivos en los commits.
+ *
+ * @param origen Ruta del archivo de origen.
+ * @param destino Ruta del archivo de destino.
+ * @return int Devuelve 0 si la copia fue exitosa, -1 si hubo algún error.
+ */
 int copiar_archivo(const char *origen, const char *destino) {
     FILE *fsrc = fopen(origen, "rb");
     if (!fsrc) return -1;
@@ -24,7 +46,20 @@ int copiar_archivo(const char *origen, const char *destino) {
     fclose(fdst);
     return 0;
 }
-
+/**
+ * @brief Crea un nuevo commit con los archivos en el staging.
+ *
+ * La función realiza los siguientes pasos:
+ * 1. Verifica si existe "ugit/index.txt" y notifica si está vacío.
+ * 2. Determina el número de commit siguiente (commit1, commit2, ...).
+ * 3. Crea la carpeta del commit y un archivo "filelist.txt" con los archivos copiados.
+ * 4. Copia cada archivo del staging a la carpeta del commit.
+ * 5. Limpia el index.txt para el próximo commit.
+ * 6. Registra la operación en "ugit/commits.log" incluyendo fecha, hora y número de archivos.
+ *
+ * @note Esta función asume que los archivos están en el directorio de trabajo
+ *       y que los nombres no contienen subcarpetas.
+ */
 void cmd_commit() {
     FILE *index = fopen("ugit/index.txt", "r");
     if (!index) {
@@ -32,6 +67,7 @@ void cmd_commit() {
         return;
     }
 
+    
     int commit_num = 1;
     char commit_folder[512];
     while (1) {
@@ -50,6 +86,7 @@ void cmd_commit() {
         }
     }
 
+ 
     char filelist_path[512];
     sprintf(filelist_path, "%s\\filelist.txt", commit_folder);
     FILE *filelist = fopen(filelist_path, "w");
